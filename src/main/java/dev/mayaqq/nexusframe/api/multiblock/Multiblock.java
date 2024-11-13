@@ -1,6 +1,5 @@
 package dev.mayaqq.nexusframe.api.multiblock;
 
-import dev.mayaqq.nexusframe.NexusFrame;
 import dev.mayaqq.nexusframe.mixin.BucketItemMixin;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.ChunkAttachment;
@@ -69,7 +68,6 @@ public class Multiblock {
         //find the $ in the pattern
         BlockPos corner = findOffset(mainBlockPos);
         if (corner == null) {
-            LOGGER.error("Multiblock pattern does not contain $");
             return false;
         }
 
@@ -84,6 +82,23 @@ public class Multiblock {
                     BlockPos blockPos = corner.add(j, i, k);
                     Predicate<BlockState> predicate = predicates.get(pattern[i][j][k]);
                     boolean isRightBlock = predicate.test(world.getBlockState(blockPos));
+
+                    // if the block is not the right block, return false
+                    if (!isRightBlock) result = false;
+                }
+            }
+        }
+        return result;
+    }
+
+    public void preview(BlockPos mainBlockPos, World world) {
+        BlockPos corner = findOffset(mainBlockPos);
+
+        for (int i = 0; i < pattern.length; i++) {
+            for (int j = 0; j < pattern[i].length; j++) {
+                for (int k = 0; k < pattern[i][j].length; k++) {
+                    BlockPos blockPos = corner.add(j, i, k);
+                    Predicate<BlockState> predicate = predicates.get(pattern[i][j][k]);
                     //if the block is already in the map, remove it
                     if (shouldPreview) {
                         // if the elements are being previewed, remove the previews
@@ -97,13 +112,10 @@ public class Multiblock {
                             previewElements.put(blockPos, previewElement);
                         }
                     }
-                    // if the block is not the right block, return false
-                    if (!isRightBlock) result = false;
                 }
             }
         }
         previewing = !previewing;
-        return result;
     }
 
     public void rotate() {
@@ -134,6 +146,7 @@ public class Multiblock {
                 }
             }
         }
+        LOGGER.error("Multiblock pattern does not contain $");
         return null;
     }
 
