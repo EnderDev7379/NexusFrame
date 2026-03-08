@@ -285,7 +285,7 @@ public class Multiblock {
         }
 
         public static void safeMatchCheck(World world, BlockPos pos) {
-            if (world.isClient) return;
+            if (world.isClient()) return;
             Multiblock.MultiblockPreviewElement previewElement = Multiblock.previewElements.get(pos);
             if (previewElement != null) {
                 previewElement.matchCheck(world.getBlockState(pos));
